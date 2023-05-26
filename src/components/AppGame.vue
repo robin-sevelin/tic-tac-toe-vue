@@ -1,14 +1,14 @@
 <script setup lang="ts">
+  import { ref } from 'vue';
   import { Div } from '../Models/Div';
   import AppGrid from './AppGrid.vue';
 
   const divArray: Div[] = [];
+  const div = ref<Div>();
 
   for (let i = 0; i < 9; i++) {
-    const div = new Div(i);
-    div.id = i + 1;
-    divArray.push(div);
-    console.log(divArray);
+    div.value = new Div(i + 1);
+    divArray.push(div.value);
   }
 
   const handleClick = () => {

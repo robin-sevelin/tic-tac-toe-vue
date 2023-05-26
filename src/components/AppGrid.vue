@@ -2,9 +2,13 @@
   import { IDivProps } from '../Models/IDivProps';
 
   const props = defineProps<IDivProps>();
+
+  const handleClick = () => {
+    console.log('du klickade på, ' + props.div.id);
+  };
 </script>
 <template>
-  <div class="square">
+  <div @click="handleClick" class="square">
     {{ props.div.id }}
   </div>
 </template>
