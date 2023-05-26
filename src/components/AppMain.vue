@@ -1,10 +1,13 @@
 <script setup lang="ts">
+  import AppGame from './AppGame.vue';
+
   defineProps<{ content: string }>();
 </script>
 
 <template>
   <main>
     <h2>{{ content }}</h2>
+    <AppGame />
   </main>
 </template>
 
