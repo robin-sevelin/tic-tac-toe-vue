@@ -3,22 +3,34 @@
   import { Div } from '../Models/Div';
   import AppGrid from './AppGrid.vue';
 
-  const divArray: Div[] = [];
-  const div = ref<Div>();
+  const divArray = ref<Div[]>([]);
 
   for (let i = 0; i < 9; i++) {
-    div.value = new Div(i + 1);
-    divArray.push(div.value);
+    const div = new Div(i + 1, false);
+    divArray.value.push(div);
   }
 
-  const handleClick = () => {
-    console.log('du klickade på');
+  const clickDiv = (payload: number) => {
+    console.log('du klickade på, ' + payload);
+
+    divArray.value = divArray.value.map((div) => {
+      if (div.id === payload) {
+        return { ...div, isClicked: !div.isClicked };
+      } else {
+        return div;
+      }
+    });
   };
 </script>
 
 <template>
   <div class="game">
-    <AppGrid :div="div" v-for="div in divArray" :key="div.id" />
+    <AppGrid
+      @click="clickDiv"
+      :div="div"
+      v-for="div in divArray"
+      :key="div.id"
+    />
   </div>
 </template>
 

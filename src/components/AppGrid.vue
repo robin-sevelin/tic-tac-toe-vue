@@ -3,12 +3,20 @@
 
   const props = defineProps<IDivProps>();
 
+  const emits = defineEmits<{
+    (e: 'click', payload: number): void;
+  }>();
+
   const handleClick = () => {
-    console.log('du klickade på, ' + props.div.id);
+    emits('click', props.div.id);
   };
 </script>
 <template>
-  <div @click="handleClick" class="square">
+  <div
+    @click="handleClick"
+    class="square"
+    :class="{ red: props.div.isClicked, blue: !props.div.isClicked }"
+  >
     {{ props.div.id }}
   </div>
 </template>
@@ -22,5 +30,13 @@
 
   .square:hover {
     cursor: pointer;
+  }
+
+  .blue {
+    background-color: blue;
+  }
+
+  .red {
+    background-color: red;
   }
 </style>

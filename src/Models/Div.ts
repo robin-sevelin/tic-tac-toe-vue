@@ -1,3 +1,3 @@
 export class Div {
-  constructor(public id: number) {}
+  constructor(public id: number, public isClicked: boolean) {}
 }

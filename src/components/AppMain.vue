@@ -16,6 +16,7 @@
     max-width: 900px;
     margin: auto;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
