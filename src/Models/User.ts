@@ -1,7 +1,12 @@
 export class User {
   hasWon: boolean;
   isCreated: boolean;
-  constructor(public name: string, public score: number, public id: string) {
+  constructor(
+    public name: string,
+    public score: number,
+    public id: number,
+    public icon: string
+  ) {
     this.hasWon = false;
     this.isCreated = false;
   }

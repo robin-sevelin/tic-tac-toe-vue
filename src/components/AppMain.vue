@@ -1,13 +1,10 @@
 <script setup lang="ts">
-  import AppGame from './AppGame.vue';
-
-  defineProps<{ content: string }>();
+  import AppUsers from './AppUsers.vue';
 </script>
 
 <template>
   <main>
-    <h2>{{ content }}</h2>
-    <AppGame />
+    <AppUsers />
   </main>
 </template>
 

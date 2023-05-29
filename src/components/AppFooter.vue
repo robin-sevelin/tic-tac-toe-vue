@@ -14,6 +14,7 @@
 
 <style scoped>
   footer {
+    height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -21,11 +22,13 @@
     width: 100%;
     position: absolute;
     bottom: 0;
+    margin-top: 100px;
   }
 
   .img-container {
     display: flex;
     gap: 1rem;
+    padding: 1rem;
     padding: 1rem;
   }
 </style>
