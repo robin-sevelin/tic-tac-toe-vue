@@ -1,36 +1,53 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { IUserProps } from '../Models/IUserProps';
+  import { Player } from '../Models/Player';
 
-  const x = ref('');
-  const o = ref('');
+  const playerNameX = ref('');
+  const playerNameO = ref('');
 
-  const emits = defineEmits<{
-    (e: 'submitUser', x: string, o: string): void;
-  }>();
+  const playerX = ref<Player>(new Player('', 'x', 0, false));
+  const playerO = ref<Player>(new Player('', 'o', 0, false));
 
-  const props = defineProps<IUserProps>();
+  const players = ref<Player[]>([]);
 
-  const submitInput = () => {
-    if (x.value === '' || o.value === '') {
-      alert('du måste fylla i båda namnen');
-      return;
-    }
-    emits('submitUser', x.value, o.value);
+  const emits = defineEmits(['players']);
 
-    x.value = '';
-    o.value = '';
+  const submitUserX = () => {
+    playerX.value.name = playerNameX.value;
+    playerX.value.isCreated = true;
+    players.value.push(playerX.value);
+    playerNameX.value = '';
+  };
+
+  const submitUserO = () => {
+    playerO.value.name = playerNameO.value;
+    playerO.value.isCreated = true;
+    players.value.push(playerO.value);
+    playerNameO.value = '';
+
+    emits('players', players.value);
   };
 </script>
 
 <template>
-  <form @submit.prevent="submitInput" class="form-container">
+  <form
+    v-if="playerX.isCreated === false"
+    @submit.prevent="submitUserX"
+    class="form-container"
+  >
     <div class="input-container">
-      <label>Name for user X</label> <input type="text" v-model="x" />
+      <label>Name for player X</label>
+      <input type="text" v-model="playerNameX" />
     </div>
+    <div class="button-container">
+      <button>Done</button>
+    </div>
+  </form>
 
+  <form v-else class="form-container" @submit.prevent="submitUserO">
     <div class="input-container">
-      <label>Name for user O</label> <input type="text" v-model="o" />
+      <label>Name for player O</label>
+      <input type="text" v-model="playerNameO" />
     </div>
 
     <div class="button-container">
@@ -48,13 +65,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-
-  .input-container {
-    display: flex;
-    flex-direction: row;
-    margin-top: 1rem;
-    justify-content: space-between;
   }
 
   button {

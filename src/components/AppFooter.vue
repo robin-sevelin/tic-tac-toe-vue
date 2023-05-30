@@ -22,7 +22,6 @@
     width: 100%;
     position: absolute;
     bottom: 0;
-    margin-top: 100px;
   }
 
   .img-container {
