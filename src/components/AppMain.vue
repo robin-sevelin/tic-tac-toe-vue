@@ -2,31 +2,34 @@
   import AppForm from './AppForm.vue';
   import AppGame from './AppGame.vue';
   import { Player } from '../Models/Player';
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
 
   const hasTwoPlayers = ref(false);
+  const players = ref<Player[]>([]);
+  const emits = defineEmits(['players', 'playerProps']);
 
-  const playerProps = defineProps({
-    players: {
-      type: Array as () => Player[],
-      required: true,
-    },
+  onMounted(() => {
+    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
+    if (storedUsers.length > 0) {
+      checkPlayerCount(storedUsers);
+    } else {
+      hasTwoPlayers.value = false;
+    }
   });
 
-  const emits = defineEmits(['players']);
-
-  const checkPlayerCount = (players: Player[]) => {
-    if (players.length === 2) {
-      hasTwoPlayers.value = true;
-      emits('players', players);
-    }
+  const checkPlayerCount = (emittedPlayers: Player[]) => {
+    players.value = emittedPlayers;
+    localStorage.setItem('users', JSON.stringify(players.value));
+    hasTwoPlayers.value = true;
+    emits('players', players.value);
   };
 </script>
 
 <template>
   <main>
     <AppForm @players="checkPlayerCount" v-if="!hasTwoPlayers" />
-    <AppGame :players="playerProps" v-else />
+    <AppGame :players="players" v-else />
   </main>
 </template>
 

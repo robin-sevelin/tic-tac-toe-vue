@@ -16,14 +16,12 @@
     playerX.value.name = playerNameX.value;
     playerX.value.isCreated = true;
     players.value.push(playerX.value);
-    playerNameX.value = '';
   };
 
   const submitUserO = () => {
     playerO.value.name = playerNameO.value;
     playerO.value.isCreated = true;
     players.value.push(playerO.value);
-    playerNameO.value = '';
 
     emits('players', players.value);
   };
