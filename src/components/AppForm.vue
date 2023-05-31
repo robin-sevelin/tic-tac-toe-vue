@@ -5,8 +5,8 @@
   const playerNameX = ref('');
   const playerNameO = ref('');
 
-  const playerX = ref<Player>(new Player('', 'x', 0, false));
-  const playerO = ref<Player>(new Player('', 'o', 0, false));
+  const playerX = ref<Player>(new Player('', '⭕️', 0, false, false));
+  const playerO = ref<Player>(new Player('', '❎', 0, false, false));
 
   const players = ref<Player[]>([]);
 
@@ -34,7 +34,7 @@
     class="form-container"
   >
     <div class="input-container">
-      <label>Name for player X</label>
+      <label>Name for player ❎</label>
       <input type="text" v-model="playerNameX" />
     </div>
     <div class="button-container">
@@ -44,7 +44,7 @@
 
   <form v-else class="form-container" @submit.prevent="submitUserO">
     <div class="input-container">
-      <label>Name for player O</label>
+      <label>Name for player ⭕️</label>
       <input type="text" v-model="playerNameO" />
     </div>
 

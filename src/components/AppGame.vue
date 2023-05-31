@@ -4,10 +4,10 @@
   import { Div } from '../Models/Div';
   import { Player } from '../Models/Player';
 
-  const gameBoard = ref<GameBoard>(new GameBoard([], [], false, true, null, 0));
+  const gameBoard = ref<GameBoard>(new GameBoard([], [], false, true, [], 0));
   const showScore = ref(false);
   const gameDiv = ref<Div>();
-  const emits = defineEmits(['players', 'gameBoard']);
+  const emits = defineEmits(['players', 'gameBoard', 'endGame']);
 
   const props = defineProps({
     players: {
@@ -17,27 +17,16 @@
   });
 
   onMounted(() => {
-    addDivsToArray();
-    getGameBoardFromLocalStorage();
-    getUserFromLocalStorage();
     addPlayers(props.players);
+    addDivsToArray();
+    saveGameBoardToLocalStorage();
+    getGameBoardFromLocalStorage();
   });
 
   const addDivsToArray = () => {
-    gameBoard.value.gameActive = true;
     for (let i = 0; i < 9; i++) {
       gameDiv.value = new Div('', i);
       gameBoard.value.div.push(gameDiv.value);
-    }
-  };
-
-  const getUserFromLocalStorage = () => {
-    const randomNumber = Math.round(Math.random());
-    const users = localStorage.getItem('users');
-    if (users) {
-      gameBoard.value.players = JSON.parse(users);
-      const selectedUser = gameBoard.value.players[randomNumber];
-      gameBoard.value.currentPlayer = selectedUser;
     }
   };
 
@@ -50,10 +39,13 @@
     const gameBoardString = localStorage.getItem('gameBoard');
     if (gameBoardString) {
       gameBoard.value = JSON.parse(gameBoardString);
+      console.log(gameBoard.value);
     }
   };
 
   const addPlayers = (players: Player[]) => {
+    console.log(players);
+
     players.forEach((player) => {
       gameBoard.value.players.push(player);
     });
@@ -64,12 +56,15 @@
   };
 
   const endGame = () => {
-    gameBoard.value.players.splice(0, gameBoard.value.players.length);
-    localStorage.removeItem('users');
-    localStorage.removeItem('gameBoard');
-    emits('players', gameBoard.value.players);
-    gameBoard.value.gameActive = false;
-    emits('gameBoard', gameBoard.value.gameActive);
+    console.log('end game event');
+
+    // gameBoard.value.players.splice(0, gameBoard.value.players.length);
+    // localStorage.removeItem('users');
+    // localStorage.removeItem('gameBoard');
+    // emits('players', gameBoard.value.players);
+    // emits('gameBoard', gameBoard.value.gameActive);
+
+    // emits('endGame');
   };
 
   const checkWin = () => {
@@ -92,18 +87,22 @@
       const divB = gameBoard.value.div[b];
       const divC = gameBoard.value.div[c];
 
-      if (divA.name === 'X' && divB.name === 'X' && divC.name === 'X') {
-        console.log(gameBoard.value.currentPlayer?.name);
+      if (divA.name === '❎' && divB.name === '❎' && divC.name === '❎') {
+        console.log(gameBoard.value.currentPlayer[0].name);
         gameBoard.value.gameActive = false;
-      } else if (divA.name === 'O' && divB.name === 'O' && divC.name === 'O') {
-        console.log(gameBoard.value.currentPlayer?.name);
+      } else if (
+        divA.name === '⭕️' &&
+        divB.name === '⭕️' &&
+        divC.name === '⭕️'
+      ) {
+        console.log(gameBoard.value.currentPlayer[0].name);
         gameBoard.value.gameActive = false;
       }
     }
     for (let i = 0; i < gameBoard.value.div.length; i++) {
       if (
-        gameBoard.value.div[i].name === 'X' ||
-        gameBoard.value.div[i].name === 'O'
+        gameBoard.value.div[i].name === '❎' ||
+        gameBoard.value.div[i].name === '⭕️'
       ) {
         drawCounter++;
       }
@@ -115,7 +114,7 @@
   };
 
   const tagDiv = (div: Div) => {
-    console.log('hej');
+    console.log('click från div event');
 
     if (
       gameBoard.value.currentPlayerIndex >= 0 &&
@@ -123,7 +122,7 @@
     ) {
       const currentPlayer =
         gameBoard.value.players[gameBoard.value.currentPlayerIndex];
-      div.name = currentPlayer.icon === 'x' ? 'X' : 'O';
+      div.name = currentPlayer.icon === '❎' ? '❎' : '⭕️';
       gameBoard.value.currentPlayerIndex =
         (gameBoard.value.currentPlayerIndex + 1) %
         gameBoard.value.players.length;
@@ -133,19 +132,22 @@
   };
 
   const restartGame = () => {
-    const users = gameBoard.value.players;
-    const currentUser = gameBoard.value.currentPlayerIndex;
+    console.log('click från restart');
 
-    localStorage.removeItem('gameBoard');
-    gameBoard.value = new GameBoard(users, [], false, true, null, currentUser);
+    // const users = gameBoard.value.players;
+    // const currentUser = gameBoard.value.currentPlayerIndex;
 
-    addDivsToArray();
+    // localStorage.removeItem('gameBoard');
+    // gameBoard.value = new GameBoard(users, [], false, true, null, currentUser);
+
+    // addDivsToArray();
+    // gameBoard.value.gameActive = true;
   };
 </script>
 
 <template>
   <div class="currentPlayer" v-if="!showScore">
-    <h3>It's {{ gameBoard.currentPlayer?.name }}'s turn</h3>
+    <h3>It's ....'s turn</h3>
   </div>
   <div class="game" v-if="!showScore">
     <div
@@ -153,7 +155,7 @@
       class="div"
       v-for="div in gameBoard.div"
       :key="div.id"
-      @click.once="gameBoard.gameActive ? tagDiv(div) : null"
+      @click="tagDiv(div)"
     >
       {{ div.name }}
     </div>

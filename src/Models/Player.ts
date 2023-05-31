@@ -3,6 +3,7 @@ export class Player {
     public name: string,
     public icon: string,
     public score: number,
-    public isCreated: boolean
+    public isCreated: boolean,
+    public hasWon: false
   ) {}
 }

@@ -7,7 +7,7 @@ export class GameBoard {
     public div: Div[],
     public gameActive: boolean,
     public isDraw: boolean,
-    public currentPlayer: Player | null,
+    public currentPlayer: Player[],
     public currentPlayerIndex: number
   ) {}
 }

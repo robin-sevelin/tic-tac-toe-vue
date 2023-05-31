@@ -2,25 +2,24 @@
   import AppForm from './AppForm.vue';
   import AppGame from './AppGame.vue';
   import { Player } from '../Models/Player';
-  import { onMounted, ref } from 'vue';
+  import { ref } from 'vue';
 
   const hasTwoPlayers = ref(false);
   const players = ref<Player[]>([]);
   const emits = defineEmits(['players', 'playerProps']);
 
-  onMounted(() => {
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+  // onMounted(() => {
+  //   const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
 
-    if (storedUsers.length > 0) {
-      checkPlayerCount(storedUsers);
-    } else {
-      hasTwoPlayers.value = false;
-    }
-  });
+  //   if (storedUsers.length > 0) {
+  //     checkPlayerCount(storedUsers);
+  //   } else {
+  //     hasTwoPlayers.value = false;
+  //   }
+  // });
 
   const checkPlayerCount = (emittedPlayers: Player[]) => {
     players.value = emittedPlayers;
-    localStorage.setItem('users', JSON.stringify(players.value));
     hasTwoPlayers.value = true;
     emits('players', players.value);
   };
