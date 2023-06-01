@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <AppHeader content="Welcome to Tic Tac Toe" />
+  <AppHeader content="Welcome to Tic Tac Toe" img="tic-tac-toe.png" />
   <AppMain />
   <AppFooter content="Made with" vue="vue.svg" vite="vite.svg" />
 </template>

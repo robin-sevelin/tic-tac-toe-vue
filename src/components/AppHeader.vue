@@ -1,16 +1,18 @@
 <script setup lang="ts">
-  defineProps<{ content: string }>();
+  defineProps<{ content: string; img: string }>();
 </script>
 
 <template>
   <header>
     <h1>{{ content }}</h1>
+    <img :src="img" alt="tic tac toe img" width="100" />
   </header>
 </template>
 
 <style scoped>
   header {
-    height: 100px;
+    gap: 1rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;

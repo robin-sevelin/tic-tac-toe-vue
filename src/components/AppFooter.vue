@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  // defineProps<{ content: string; vue: string; vite: string }>();
+  defineProps<{ content: string; vue: string; vite: string }>();
 </script>
 
 <template>
   <footer>
-    <!-- <h2>{{ content }}</h2>
+    <h2>{{ content }}</h2>
     <div class="img-container">
       <img :src="vue" alt="vue logo" height="75" />
-      <img :src="vite" alt="vite logo" height="75" /> -->
-    <!-- </div> -->
+      <img :src="vite" alt="vite logo" height="75" />
+    </div>
   </footer>
 </template>
 

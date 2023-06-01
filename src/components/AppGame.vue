@@ -32,6 +32,7 @@
       gameDiv.value = new Div('', i, false);
       gameBoard.value.div.push(gameDiv.value);
     }
+    saveGameBoardToLocalStorage();
   };
 
   const saveGameBoardToLocalStorage = () => {
@@ -51,6 +52,7 @@
     players.forEach((player) => {
       gameBoard.value.players.push(player);
     });
+    saveGameBoardToLocalStorage();
   };
 
   const currentPlayerName = computed(() => {
@@ -112,7 +114,7 @@
       const divB = gameBoard.value.div[b];
       const divC = gameBoard.value.div[c];
 
-      if (divA.name === '❎' && divB.name === '❎' && divC.name === '❎') {
+      if (divA.name === '✗' && divB.name === '✗' && divC.name === '✗') {
         gameBoard.value.players[0].score += 1;
         saveGameBoardToLocalStorage();
         return (gameBoard.value.gameActive = false);
@@ -128,7 +130,7 @@
     }
     for (let i = 0; i < gameBoard.value.div.length; i++) {
       if (
-        gameBoard.value.div[i].name === '❎' ||
+        gameBoard.value.div[i].name === '✗' ||
         gameBoard.value.div[i].name === '⭕️'
       ) {
         drawCounter++;
@@ -148,7 +150,7 @@
     ) {
       const currentPlayer =
         gameBoard.value.players[gameBoard.value.currentPlayerIndex];
-      div.name = currentPlayer.icon === '❎' ? '❎' : '⭕️';
+      div.name = currentPlayer.icon === '✗' ? '✗' : '⭕️';
       gameBoard.value.div[div.id].clicked = true;
 
       gameBoard.value.currentPlayerIndex =
@@ -172,9 +174,9 @@
   <div class="currentPlayer" v-if="!showScore">
     <h3 v-if="gameBoard.gameActive">It's {{ currentPlayerName }}'s turn</h3>
     <h3 v-else-if="gameBoard.isDraw">it's a draw</h3>
-    <h3 v-else>{{ getWinnerName() }} won</h3>
+    <h3 v-else>{{ getWinnerName() }} won 🥇</h3>
   </div>
-  <div class="game" v-if="!showScore">
+  <div class="divContainer" v-if="!showScore">
     <div
       class="div"
       v-for="div in gameBoard.div"
@@ -211,7 +213,7 @@
     height: 50px;
   }
   .score {
-    height: 300px;
+    height: 380px;
   }
 
   ul {
@@ -225,18 +227,7 @@
     gap: 1rem;
   }
 
-  button {
-    width: 100px;
-    height: 50px;
-    font-size: 1rem;
-  }
-
-  button:hover {
-    background-color: lightgray;
-    transition: 0.3s ease-in-out;
-    cursor: pointer;
-  }
-  .game {
+  .divContainer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -245,18 +236,25 @@
   }
   .div {
     border: 1px solid black;
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: 2rem;
+    background-color: white;
   }
 
   .div:hover {
     background-color: lightgray;
     transition: 0.3s ease-in-out;
     cursor: pointer;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .button-container {
+      flex-direction: column;
+    }
   }
 </style>

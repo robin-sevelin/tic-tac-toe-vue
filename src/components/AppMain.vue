@@ -54,7 +54,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    top: 100px;
+    top: 50px;
     margin-bottom: 100px;
     padding-bottom: 2rem;
   }

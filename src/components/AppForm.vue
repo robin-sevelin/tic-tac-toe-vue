@@ -5,8 +5,8 @@
   const playerNameX = ref('');
   const playerNameO = ref('');
 
-  const playerX = ref<Player>(new Player('', '⭕️', 0, false));
-  const playerO = ref<Player>(new Player('', '❎', 0, false));
+  const playerX = ref<Player>(new Player('', '✗', 0, false));
+  const playerO = ref<Player>(new Player('', '⭕️', 0, false));
 
   const players = ref<Player[]>([]);
 
@@ -34,7 +34,7 @@
     class="form-container"
   >
     <div class="input-container">
-      <label>Name for player ❎</label>
+      <label>Name for player ✗</label>
       <input type="text" v-model="playerNameX" />
     </div>
     <div class="button-container">
@@ -63,19 +63,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-
-  button {
-    height: 50px;
-    width: 100px;
-    font-size: 1rem;
-    margin-top: 1rem;
-    background-color: lightgreen;
-    border-radius: 10px;
-  }
-
-  button:hover {
-    cursor: pointer;
   }
 
   input {
