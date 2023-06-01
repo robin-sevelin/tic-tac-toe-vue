@@ -3,26 +3,21 @@
   import { GameBoard } from '../Models/GameBoard';
   import { Div } from '../Models/Div';
   import { Player } from '../Models/Player';
+  import { IPlayerProps } from '../Models/IPlayerProps';
 
+  const showScore = ref(false);
+  const gameDiv = ref<Div>();
+  const emits = defineEmits(['players', 'endGame']);
+  const props = defineProps<IPlayerProps>();
   const gameBoard = ref<GameBoard>(
     new GameBoard([], [], true, false, [], 0) ||
       localStorage.getItem('gameBoard')
   );
-  const showScore = ref(false);
-  const gameDiv = ref<Div>();
-  const emits = defineEmits(['players', 'endGame']);
-
-  const props = defineProps({
-    players: {
-      type: Array as () => Player[],
-      required: true,
-    },
-  });
 
   onMounted(() => {
     getGameBoardFromLocalStorage();
     if (localStorage.getItem('gameBoard') === null) {
-      addPlayers(props.players);
+      addPlayers(props.playerProps);
       addDivsToArray();
     }
   });
@@ -49,7 +44,8 @@
   };
 
   const addPlayers = (players: Player[]) => {
-    players.forEach((player) => {
+    players.forEach((player, index) => {
+      player.icon = index === 0 ? '✗' : '⭕️';
       gameBoard.value.players.push(player);
     });
     saveGameBoardToLocalStorage();
@@ -61,10 +57,11 @@
   });
 
   const getWinnerName = () => {
-    const currentPlayerIcon = gameBoard.value.currentPlayer[0]?.icon;
-    return currentPlayerIcon === '❎'
-      ? gameBoard.value.players[0].name
-      : gameBoard.value.players[1].name;
+    const currentPlayerIcon =
+      gameBoard.value.players[gameBoard.value.currentPlayerIndex]?.icon;
+    const winnerIcon = currentPlayerIcon === '✗' ? '⭕️' : '✗';
+    const winnerPlayer = getPlayerByIcon(winnerIcon);
+    return winnerPlayer?.name;
   };
 
   const getScoreList = computed(() => {
@@ -115,7 +112,11 @@
       const divC = gameBoard.value.div[c];
 
       if (divA.name === '✗' && divB.name === '✗' && divC.name === '✗') {
-        gameBoard.value.players[0].score += 1;
+        const foundPlayer = getPlayerByIcon('✗');
+
+        if (foundPlayer) {
+          foundPlayer.score += 1;
+        }
         saveGameBoardToLocalStorage();
         return (gameBoard.value.gameActive = false);
       } else if (
@@ -123,7 +124,11 @@
         divB.name === '⭕️' &&
         divC.name === '⭕️'
       ) {
-        gameBoard.value.players[1].score += 1;
+        const foundPlayer = getPlayerByIcon('⭕️');
+
+        if (foundPlayer) {
+          foundPlayer.score += 1;
+        }
         saveGameBoardToLocalStorage();
         return (gameBoard.value.gameActive = false);
       }
@@ -143,22 +148,21 @@
     }
   };
 
-  const tagDiv = (div: Div) => {
-    if (
-      gameBoard.value.currentPlayerIndex >= 0 &&
-      gameBoard.value.currentPlayerIndex < gameBoard.value.players.length
-    ) {
-      const currentPlayer =
-        gameBoard.value.players[gameBoard.value.currentPlayerIndex];
-      div.name = currentPlayer.icon === '✗' ? '✗' : '⭕️';
-      gameBoard.value.div[div.id].clicked = true;
+  const getPlayerByIcon = (icon: string) => {
+    return gameBoard.value.players.find((player) => player.icon === icon);
+  };
 
-      gameBoard.value.currentPlayerIndex =
-        (gameBoard.value.currentPlayerIndex + 1) %
-        gameBoard.value.players.length;
-    }
-    saveGameBoardToLocalStorage();
+  const tagDiv = (div: Div) => {
+    const currentPlayer =
+      gameBoard.value.players[gameBoard.value.currentPlayerIndex];
+    div.name = currentPlayer.icon;
+    div.clicked = true;
+
+    gameBoard.value.currentPlayerIndex =
+      (gameBoard.value.currentPlayerIndex + 1) % gameBoard.value.players.length;
+
     checkWin();
+    saveGameBoardToLocalStorage();
   };
 
   const restartGame = () => {

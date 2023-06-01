@@ -28,7 +28,6 @@
   });
 
   const checkPlayerCount = (emittedPlayers: Player[]) => {
-    console.log(emittedPlayers);
     if (emittedPlayers.length === 0) {
       return (hasTwoPlayers.value = false);
     }
@@ -41,7 +40,7 @@
 <template>
   <main>
     <AppForm @players="checkPlayerCount" v-if="!hasTwoPlayers" />
-    <AppGame :players="players" @endGame="checkPlayerCount" v-else />
+    <AppGame :playerProps="players" @endGame="checkPlayerCount" v-else />
   </main>
 </template>
 

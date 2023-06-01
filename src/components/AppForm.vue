@@ -5,8 +5,8 @@
   const playerNameX = ref('');
   const playerNameO = ref('');
 
-  const playerX = ref<Player>(new Player('', '✗', 0, false));
-  const playerO = ref<Player>(new Player('', '⭕️', 0, false));
+  const playerX = ref<Player>(new Player('', '✗', 0, 0, false));
+  const playerO = ref<Player>(new Player('', '⭕️', 1, 0, false));
 
   const players = ref<Player[]>([]);
 
@@ -34,8 +34,8 @@
     class="form-container"
   >
     <div class="input-container">
-      <label>Name for player ✗</label>
-      <input type="text" v-model="playerNameX" />
+      <label for="inputX">Name for player ✗</label>
+      <input id="inputX" type="text" v-model="playerNameX" autofocus />
     </div>
     <div class="button-container">
       <button :disabled="playerNameX === ''">Done</button>
@@ -44,8 +44,8 @@
 
   <form v-else class="form-container" @submit.prevent="submitUserO">
     <div class="input-container">
-      <label>Name for player ⭕️</label>
-      <input type="text" v-model="playerNameO" />
+      <label for="inputO">Name for player ⭕️</label>
+      <input id="inputO" type="text" v-model="playerNameO" autofocus />
     </div>
 
     <div class="button-container">
