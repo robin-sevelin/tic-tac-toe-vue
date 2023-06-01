@@ -2,23 +2,36 @@
   import AppForm from './AppForm.vue';
   import AppGame from './AppGame.vue';
   import { Player } from '../Models/Player';
-  import { ref } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
 
   const hasTwoPlayers = ref(false);
   const players = ref<Player[]>([]);
-  const emits = defineEmits(['players', 'playerProps']);
+  const emits = defineEmits(['players']);
 
-  // onMounted(() => {
-  //   const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+  onMounted(() => {
+    getGameBoardFromLocalStorage();
+    if (localStorage.getItem('gameBoard') === null) {
+      checkPlayerCount(players.value);
+    }
+  });
 
-  //   if (storedUsers.length > 0) {
-  //     checkPlayerCount(storedUsers);
-  //   } else {
-  //     hasTwoPlayers.value = false;
-  //   }
-  // });
+  const getGameBoardFromLocalStorage = () => {
+    const storedBoard = localStorage.getItem('gameBoard');
+    if (storedBoard) {
+      hasTwoPlayers.value = JSON.parse(storedBoard);
+    }
+  };
+
+  const hasLocalStorageData = computed(() => {
+    const storedBoard = localStorage.getItem('gameBoard');
+    return storedBoard;
+  });
 
   const checkPlayerCount = (emittedPlayers: Player[]) => {
+    console.log(emittedPlayers);
+    if (emittedPlayers.length === 0) {
+      return (hasTwoPlayers.value = false);
+    }
     players.value = emittedPlayers;
     hasTwoPlayers.value = true;
     emits('players', players.value);
@@ -28,7 +41,7 @@
 <template>
   <main>
     <AppForm @players="checkPlayerCount" v-if="!hasTwoPlayers" />
-    <AppGame :players="players" v-else />
+    <AppGame :players="players" @endGame="checkPlayerCount" v-else />
   </main>
 </template>
 

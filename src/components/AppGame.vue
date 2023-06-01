@@ -1,13 +1,16 @@
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import { GameBoard } from '../Models/GameBoard';
   import { Div } from '../Models/Div';
   import { Player } from '../Models/Player';
 
-  const gameBoard = ref<GameBoard>(new GameBoard([], [], false, true, [], 0));
+  const gameBoard = ref<GameBoard>(
+    new GameBoard([], [], true, false, [], 0) ||
+      localStorage.getItem('gameBoard')
+  );
   const showScore = ref(false);
   const gameDiv = ref<Div>();
-  const emits = defineEmits(['players', 'gameBoard', 'endGame']);
+  const emits = defineEmits(['players', 'endGame']);
 
   const props = defineProps({
     players: {
@@ -17,54 +20,76 @@
   });
 
   onMounted(() => {
-    addPlayers(props.players);
-    addDivsToArray();
-    saveGameBoardToLocalStorage();
     getGameBoardFromLocalStorage();
+    if (localStorage.getItem('gameBoard') === null) {
+      addPlayers(props.players);
+      addDivsToArray();
+    }
   });
 
   const addDivsToArray = () => {
     for (let i = 0; i < 9; i++) {
-      gameDiv.value = new Div('', i);
+      gameDiv.value = new Div('', i, false);
       gameBoard.value.div.push(gameDiv.value);
     }
   };
 
   const saveGameBoardToLocalStorage = () => {
-    const gameBoardString = JSON.stringify(gameBoard.value);
-    localStorage.setItem('gameBoard', gameBoardString);
+    const gameData = gameBoard.value;
+    const gameDataString = JSON.stringify(gameData);
+    localStorage.setItem('gameBoard', gameDataString);
   };
 
   const getGameBoardFromLocalStorage = () => {
     const gameBoardString = localStorage.getItem('gameBoard');
     if (gameBoardString) {
       gameBoard.value = JSON.parse(gameBoardString);
-      console.log(gameBoard.value);
     }
   };
 
   const addPlayers = (players: Player[]) => {
-    console.log(players);
-
     players.forEach((player) => {
       gameBoard.value.players.push(player);
     });
   };
+
+  const currentPlayerName = computed(() => {
+    const currentPlayerIndex = gameBoard.value.currentPlayerIndex;
+    return gameBoard.value.players[currentPlayerIndex]?.name;
+  });
+
+  const getWinnerName = () => {
+    const currentPlayerIcon = gameBoard.value.currentPlayer[0]?.icon;
+    return currentPlayerIcon === '❎'
+      ? gameBoard.value.players[0].name
+      : gameBoard.value.players[1].name;
+  };
+
+  const getScoreList = computed(() => {
+    const scoresList = [
+      {
+        name: gameBoard.value.players[0].name,
+        score: gameBoard.value.players[0].score,
+        id: 0,
+      },
+      {
+        name: gameBoard.value.players[1].name,
+        score: gameBoard.value.players[1].score,
+        id: 1,
+      },
+    ];
+
+    return scoresList;
+  });
 
   const toggleShowScore = () => {
     showScore.value = !showScore.value;
   };
 
   const endGame = () => {
-    console.log('end game event');
-
-    // gameBoard.value.players.splice(0, gameBoard.value.players.length);
-    // localStorage.removeItem('users');
-    // localStorage.removeItem('gameBoard');
-    // emits('players', gameBoard.value.players);
-    // emits('gameBoard', gameBoard.value.gameActive);
-
-    // emits('endGame');
+    localStorage.removeItem('gameBoard');
+    gameBoard.value.players = [];
+    emits('endGame', gameBoard.value.players);
   };
 
   const checkWin = () => {
@@ -88,15 +113,17 @@
       const divC = gameBoard.value.div[c];
 
       if (divA.name === '❎' && divB.name === '❎' && divC.name === '❎') {
-        console.log(gameBoard.value.currentPlayer[0].name);
-        gameBoard.value.gameActive = false;
+        gameBoard.value.players[0].score += 1;
+        saveGameBoardToLocalStorage();
+        return (gameBoard.value.gameActive = false);
       } else if (
         divA.name === '⭕️' &&
         divB.name === '⭕️' &&
         divC.name === '⭕️'
       ) {
-        console.log(gameBoard.value.currentPlayer[0].name);
-        gameBoard.value.gameActive = false;
+        gameBoard.value.players[1].score += 1;
+        saveGameBoardToLocalStorage();
+        return (gameBoard.value.gameActive = false);
       }
     }
     for (let i = 0; i < gameBoard.value.div.length; i++) {
@@ -108,14 +135,13 @@
       }
     }
     if (drawCounter === gameBoard.value.div.length) {
-      alert('its a draw');
-      gameBoard.value.gameActive = false;
+      saveGameBoardToLocalStorage();
+      gameBoard.value.isDraw = true;
+      return (gameBoard.value.gameActive = false);
     }
   };
 
   const tagDiv = (div: Div) => {
-    console.log('click från div event');
-
     if (
       gameBoard.value.currentPlayerIndex >= 0 &&
       gameBoard.value.currentPlayerIndex < gameBoard.value.players.length
@@ -123,39 +149,43 @@
       const currentPlayer =
         gameBoard.value.players[gameBoard.value.currentPlayerIndex];
       div.name = currentPlayer.icon === '❎' ? '❎' : '⭕️';
+      gameBoard.value.div[div.id].clicked = true;
+
       gameBoard.value.currentPlayerIndex =
         (gameBoard.value.currentPlayerIndex + 1) %
         gameBoard.value.players.length;
     }
-    checkWin();
     saveGameBoardToLocalStorage();
+    checkWin();
   };
 
   const restartGame = () => {
-    console.log('click från restart');
+    const users = gameBoard.value.players;
+    const currentUser = gameBoard.value.currentPlayerIndex;
 
-    // const users = gameBoard.value.players;
-    // const currentUser = gameBoard.value.currentPlayerIndex;
-
-    // localStorage.removeItem('gameBoard');
-    // gameBoard.value = new GameBoard(users, [], false, true, null, currentUser);
-
-    // addDivsToArray();
-    // gameBoard.value.gameActive = true;
+    gameBoard.value = new GameBoard(users, [], true, false, users, currentUser);
+    addDivsToArray();
   };
 </script>
 
 <template>
   <div class="currentPlayer" v-if="!showScore">
-    <h3>It's ....'s turn</h3>
+    <h3 v-if="gameBoard.gameActive">It's {{ currentPlayerName }}'s turn</h3>
+    <h3 v-else-if="gameBoard.isDraw">it's a draw</h3>
+    <h3 v-else>{{ getWinnerName() }} won</h3>
   </div>
   <div class="game" v-if="!showScore">
     <div
-      :v-model="gameDiv"
       class="div"
       v-for="div in gameBoard.div"
       :key="div.id"
       @click="tagDiv(div)"
+      :style="{
+        pointerEvents:
+          div.clicked || gameBoard.isDraw || !gameBoard.gameActive
+            ? 'none'
+            : 'auto',
+      }"
     >
       {{ div.name }}
     </div>
@@ -163,14 +193,14 @@
   <div class="score" v-if="showScore">
     <h3>Here are the player scores</h3>
     <ul>
-      <li v-for="player in players">
-        {{ player.name }}, {{ player.score }} points
+      <li v-for="score in getScoreList" :key="score.id">
+        {{ score.name }}: {{ score.score }} points
       </li>
     </ul>
   </div>
 
   <div class="button-container">
-    <button @click="toggleShowScore">Check score history</button>
+    <button @click="toggleShowScore">Toggle score board</button>
     <button @click="restartGame">Restart game</button>
     <button @click="endGame">End game session</button>
   </div>
@@ -187,6 +217,7 @@
   ul {
     padding: 1rem;
     gap: 1rem;
+    list-style: none;
   }
   .button-container {
     padding: 2rem;
