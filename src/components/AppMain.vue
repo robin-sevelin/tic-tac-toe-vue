@@ -10,7 +10,7 @@
 
   onMounted(() => {
     getGameBoardFromLocalStorage();
-    if (localStorage.getItem('gameBoard') === null) {
+    if (!localStorage.getItem('gameBoard')) {
       checkPlayerCount(players.value);
     }
   });
@@ -21,11 +21,6 @@
       hasTwoPlayers.value = JSON.parse(storedBoard);
     }
   };
-
-  const hasLocalStorageData = computed(() => {
-    const storedBoard = localStorage.getItem('gameBoard');
-    return storedBoard;
-  });
 
   const checkPlayerCount = (emittedPlayers: Player[]) => {
     if (emittedPlayers.length === 0) {

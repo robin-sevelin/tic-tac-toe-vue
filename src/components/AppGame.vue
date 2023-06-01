@@ -16,7 +16,7 @@
 
   onMounted(() => {
     getGameBoardFromLocalStorage();
-    if (localStorage.getItem('gameBoard') === null) {
+    if (!localStorage.getItem('gameBoard')) {
       addPlayers(props.playerProps);
       addDivsToArray();
     }

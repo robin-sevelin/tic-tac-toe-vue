@@ -12,10 +12,6 @@ body {
   padding-bottom: 75px;
 }
 
-img:hover {
-  cursor: pointer;
-}
-
 button {
   position: relative;
   top: 2rem;
