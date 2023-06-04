@@ -2,7 +2,7 @@
   import AppForm from './AppForm.vue';
   import AppGame from './AppGame.vue';
   import { Player } from '../Models/Player';
-  import { computed, onMounted, ref } from 'vue';
+  import { onMounted, ref } from 'vue';
 
   const hasTwoPlayers = ref(false);
   const players = ref<Player[]>([]);
