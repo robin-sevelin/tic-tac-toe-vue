@@ -4,15 +4,16 @@
   import { Div } from '../Models/Div';
   import { Player } from '../Models/Player';
   import { IPlayerProps } from '../Models/IPlayerProps';
+  import AppDiv from './AppDiv.vue';
 
   const showScore = ref(false);
-  const gameDiv = ref<Div>();
-  const emits = defineEmits(['players', 'endGame']);
   const props = defineProps<IPlayerProps>();
   const gameBoard = ref<GameBoard>(
     new GameBoard([], [], true, false, [], 0) ||
       localStorage.getItem('gameBoard')
   );
+
+  const emits = defineEmits(['players', 'endGame']);
 
   onMounted(() => {
     getGameBoardFromLocalStorage();
@@ -24,8 +25,8 @@
 
   const addDivsToArray = () => {
     for (let i = 0; i < 9; i++) {
-      gameDiv.value = new Div('', i, false);
-      gameBoard.value.div.push(gameDiv.value);
+      const div = new Div('', i, false);
+      gameBoard.value.div.push(div);
     }
     saveGameBoardToLocalStorage();
   };
@@ -77,7 +78,6 @@
         id: 1,
       },
     ];
-
     return scoresList;
   });
 
@@ -152,11 +152,18 @@
     return gameBoard.value.players.find((player) => player.icon === icon);
   };
 
-  const tagDiv = (div: Div) => {
+  const tagDiv = (payload: Div) => {
     const currentPlayer =
       gameBoard.value.players[gameBoard.value.currentPlayerIndex];
-    div.name = currentPlayer.icon;
-    div.clicked = true;
+
+    const divToUpdate = gameBoard.value.div.find(
+      (div) => div.id === payload.id
+    );
+
+    if (divToUpdate) {
+      divToUpdate.name = currentPlayer.icon;
+      divToUpdate.clicked = true;
+    }
 
     gameBoard.value.currentPlayerIndex =
       (gameBoard.value.currentPlayerIndex + 1) % gameBoard.value.players.length;
@@ -181,20 +188,18 @@
     <h3 v-else>{{ getWinnerName() }} won 🥇</h3>
   </div>
   <div class="divContainer" v-if="!showScore">
-    <div
-      class="div"
+    <AppDiv
+      :divProps="div"
+      @tag="tagDiv"
       v-for="div in gameBoard.div"
       :key="div.id"
-      @click="tagDiv(div)"
       :style="{
         pointerEvents:
           div.clicked || gameBoard.isDraw || !gameBoard.gameActive
             ? 'none'
             : 'auto',
       }"
-    >
-      {{ div.name }}
-    </div>
+    />
   </div>
   <div class="score" v-if="showScore">
     <h3>Here are the player scores</h3>
@@ -237,23 +242,6 @@
     grid-template-rows: repeat(3, 1fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
-  }
-  .div {
-    border: 1px solid black;
-    width: 110px;
-    height: 110px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    background-color: white;
-  }
-
-  .div:hover {
-    background-color: lightgray;
-    transition: 0.3s ease-in-out;
-    cursor: pointer;
   }
 
   @media only screen and (max-width: 700px) {
